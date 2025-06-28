@@ -1,25 +1,40 @@
 import streamlit as st
 
-def calc_income_tax(income):
-    taxable = max(income - 48, 0)  # 万円単位、基礎控除48万円
-    brackets = [195, 330, 695, 900, 1800, 4000]
-    rates = [0.05, 0.10, 0.20, 0.23, 0.33, 0.40, 0.45]
-    deductions = [0, 9.75, 42.75, 63.6, 153.6, 279.6, 479.6]
+st.set_page_config(page_title="日豪相続＆所得税シミュレーター", layout="centered")
+st.title("🧾 日豪相続＆所得税シミュレーター")
 
-    for i, threshold in enumerate(brackets):
-        if taxable <= threshold:
-            return max(taxable * rates[i] - deductions[i], 0)
-    return max(taxable * rates[-1] - deductions[-1], 0)
+# ---------------- 所得税・住民税シミュレーター ----------------
+st.header("💰 所得税・住民税シミュレーター（日本）")
 
-def calc_resident_tax(income):
-    taxable = max(income - 48, 0)
-    return taxable * 0.10
-import streamlit as st
+income = st.number_input("年間所得額（万円）", min_value=0, step=50)
+basic_deduction = 48  # 万円（基礎控除）
+taxable_income = max(income - basic_deduction, 0)
 
-st.set_page_config(page_title="日豪相続シミュレーター", layout="centered")
-st.title("🌏 日豪相続シミュレーター")
+# 所得税率（簡易版）
+income_tax_brackets = [195, 330, 695, 900, 1800, float("inf")]
+income_tax_rates = [0.05, 0.10, 0.20, 0.23, 0.33, 0.40]
+income_tax_deductions = [0, 9.75, 42.75, 63.6, 153.6, 279.6]
 
-mode = st.radio("相続税制度を選択してください", ["日本（Japan）", "オーストラリア（Australia）"])
+def calc_income_tax(amount):
+    for i, threshold in enumerate(income_tax_brackets):
+        if amount <= threshold:
+            return max(amount * income_tax_rates[i] - income_tax_deductions[i], 0)
+    return 0
+
+income_tax = calc_income_tax(taxable_income)
+resident_tax = taxable_income * 0.10
+
+if st.button("所得税＋住民税を計算する"):
+    st.subheader("📊 税額の試算結果")
+    st.write(f"課税所得額：{taxable_income:.1f} 万円")
+    st.write(f"所得税：{income_tax:.1f} 万円")
+    st.write(f"住民税：{resident_tax:.1f} 万円")
+    st.success(f"合計納税額：約 {income_tax + resident_tax:.1f} 万円")
+
+# ---------------- 相続税シミュレーター（日豪切替） ----------------
+st.header("🌏 相続税シミュレーター（日豪切替）")
+
+mode = st.radio("相続税制度を選択", ["日本（Japan）", "オーストラリア（Australia）"])
 
 if mode == "日本（Japan）":
     st.subheader("🇯🇵 日本モード")
@@ -42,7 +57,6 @@ if mode == "日本（Japan）":
     taxable_inheritance = max(total_inheritance - basic_deduction, 0)
     share_per_heir = taxable_inheritance / heir_count if heir_count > 0 else 0
 
-    # 相続税計算ロジック
     brackets = [1000, 3000, 5000, 10000, 20000, float("inf")]
     rates = [0.10, 0.15, 0.20, 0.30, 0.40, 0.55]
     deductions = [0, 50, 200, 700, 1700, 0]
@@ -100,7 +114,7 @@ else:
 
     if st.button("CGT（キャピタルゲイン税）を計算"):
         taxable_gain = gain * (0.5 if cgt_discount else 1.0)
-        cgt_tax = taxable_gain * 0.45  # 上位税率
+        cgt_tax = taxable_gain * 0.45
         st.write(f"キャピタルゲイン：${gain:,.0f} AUD")
         st.write(f"課税対象額（控除後）：${taxable_gain:,.0f} AUD")
         st.success(f"🇦🇺 想定されるCGT：${cgt_tax:,.0f} AUD")
