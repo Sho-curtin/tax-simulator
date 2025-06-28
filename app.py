@@ -65,7 +65,7 @@ st.header("🏠 不動産情報")
 with st.expander("📦 不動産評価額の入力"):
     land_value = st.number_input("土地の評価額（万円）", min_value=0, step=100)
     building_value = st.number_input("建物の評価額（万円）", min_value=0, step=100)
-    location = st.text_input("所在地（例：東京都港区）")
+    location = st.text_input("所在地（例：東京都港区麻布十番1-1-1）")
     total_property_value = land_value + building_value
 
     if total_property_value > 0:
@@ -97,7 +97,7 @@ st.header("🤖 AI相続・税金アドバイザー（ChatGPT風）")
 openai_api_key = st.text_input("OpenAI APIキーを入力", type="password")
 question = st.text_area("ご相談内容を入力（例：相続税を抑えるには？）")
 
-if st.button("AIに相談する"):
+if st.button("AIに相談する", key="ai_consult"):
     if openai_api_key and question:
         try:
             openai.api_key = openai_api_key
