@@ -14,7 +14,6 @@ def calc_income_tax(income):
 def calc_resident_tax(income):
     taxable = max(income - 48, 0)
     return taxable * 0.10
-
 import streamlit as st
 
 st.set_page_config(page_title="日豪相続シミュレーター", layout="centered")
