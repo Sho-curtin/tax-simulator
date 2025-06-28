@@ -31,6 +31,10 @@ with st.expander("📋 制度概要の比較表"):
     df_compare = pd.DataFrame(comparison_data)
     st.dataframe(df_compare, use_container_width=True)
 
+# ---------------- 居住区分チェック ----------------
+st.header("🏠 日本居住区分チェック")
+is_resident = st.checkbox("現在日本に住民票がある（非居住者でない）")
+
 # ---------------- 所得税・住民税シミュレーター ----------------
 st.header("💰 所得税・住民税シミュレーター（日本）")
 
@@ -49,15 +53,18 @@ def calc_income_tax(amount):
             return max(amount * income_tax_rates[i] - income_tax_deductions[i], 0)
     return 0
 
-income_tax = calc_income_tax(taxable_income)
-resident_tax = taxable_income * 0.10
+if is_resident:
+    income_tax = calc_income_tax(taxable_income)
+    resident_tax = taxable_income * 0.10
 
-if st.button("所得税＋住民税を計算する"):
-    st.subheader("📊 税額の試算結果")
-    st.write(f"課税所得額：{taxable_income:.1f} 万円")
-    st.write(f"所得税：{income_tax:.1f} 万円")
-    st.write(f"住民税：{resident_tax:.1f} 万円")
-    st.success(f"合計納税額：約 {income_tax + resident_tax:.1f} 万円")
+    if st.button("所得税＋住民税を計算する"):
+        st.subheader("📊 税額の試算結果")
+        st.write(f"課税所得額：{taxable_income:.1f} 万円")
+        st.write(f"所得税：{income_tax:.1f} 万円")
+        st.write(f"住民税：{resident_tax:.1f} 万円")
+        st.success(f"合計納税額：約 {income_tax + resident_tax:.1f} 万円")
+else:
+    st.info("※非居住者の場合、日本国内源泉所得に限定して課税対象となります。")
 
 # ---------------- 不動産情報入力 ----------------
 st.header("🏠 不動産情報")
