@@ -97,25 +97,25 @@ st.header("🤖 AI相続・税金アドバイザー（ChatGPT風）")
 openai_api_key = st.text_input("OpenAI APIキーを入力", type="password")
 question = st.text_area("ご相談内容を入力（例：相続税を抑えるには？）")
 
-if st.button("AIに相談する") and openai_api_key and question:
-    try:
-        openai.api_key = openai_api_key
-        with st.spinner("AIが回答中..."):
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=[
-                    {"role": "system", "content": "あなたは日本とオーストラリアの税制・相続制度に詳しい専門家です。"},
-                    {"role": "user", "content": question}
-                ]
-            )
-            answer = response["choices"][0]["message"]["content"]
-            st.success("AIの回答：")
-            st.write(answer)
-    except Exception as e:
-        st.error(f"エラーが発生しました: {str(e)}")
-elif st.button("AIに相談する"):
-    st.warning("APIキーと相談内容を入力してください。")
+if st.button("AIに相談する"):
+    if openai_api_key and question:
+        try:
+            openai.api_key = openai_api_key
+            with st.spinner("AIが回答中..."):
+                response = openai.ChatCompletion.create(
+                    model="gpt-4",
+                    messages=[
+                        {"role": "system", "content": "あなたは日本とオーストラリアの税制・相続制度に詳しい専門家です。"},
+                        {"role": "user", "content": question}
+                    ]
+                )
+                answer = response["choices"][0]["message"]["content"]
+                st.success("AIの回答：")
+                st.write(answer)
+        except Exception as e:
+            st.error(f"エラーが発生しました: {str(e)}")
+    else:
+        st.warning("APIキーと相談内容を入力してください。")
 
 # ---------------- 法改正アップデート案内 ----------------
 st.info("📚 このシミュレーターは令和6年度日本税制・2024年豪州CGT制度に基づいています。アップデートが必要な場合は最新の法改正をご確認ください。GitHub: https://github.com/yourrepo")
-
